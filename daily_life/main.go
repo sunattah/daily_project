@@ -5,26 +5,58 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-)
 
+	"daily_life/models"
+)
 type Task struct {
 	ID        int
 	Title     string
 	Priority  string
 	Completed bool
 }
+
 type Activity struct {
 	ID       int
 	Time     string
 	Activity string
 }
 
-var schedule []Activity
 
+var tasks []models.Task
+var nextID = 1
+
+var schedule []models.Activity
 var nextActivityID = 1
 
-var tasks []Task
-var nextID = 1
+
+
+func addNote(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	title := r.FormValue("title")
+	content := r.FormValue("content")
+
+	if title == "" || content == "" {
+		http.Redirect(w, r, "/notes", http.StatusSeeOther)
+		return
+	}
+
+	note := Note{
+		ID:      nextNoteID,
+		Title:   title,
+		Content: content,
+	}
+
+	notes = append(notes, note)
+
+	nextNoteID++
+
+	http.Redirect(w, r, "/notes", http.StatusSeeOther)
+}
 
 func home(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("templates/index.html")
@@ -45,6 +77,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
 func showSchedule(w http.ResponseWriter, r *http.Request) {
 
 	tmpl, err := template.ParseFiles("templates/schedule.html")
@@ -136,6 +169,34 @@ func deleteTask(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+func deleteNote(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	id := 0
+
+	_, err := fmt.Sscanf(r.FormValue("id"), "%d", &id)
+
+	if err != nil {
+		http.Error(w, "Invalid note ID", http.StatusBadRequest)
+		return
+	}
+
+	for i := range notes {
+
+		if notes[i].ID == id {
+
+			notes = append(notes[:i], notes[i+1:]...)
+
+			break
+		}
+	}
+
+	http.Redirect(w, r, "/notes", http.StatusSeeOther)
+}
 
 func main() {
 	http.HandleFunc("/", home)
@@ -143,6 +204,9 @@ func main() {
 	http.HandleFunc("/complete-task", completeTask)
 	http.HandleFunc("/delete-task", deleteTask)
 	http.HandleFunc("/schedule", showSchedule)
+	http.HandleFunc("/notes", showNotes)
+	http.HandleFunc("/add-note", addNote)
+	http.HandleFunc("/delete-note", deleteNote)
 
 	http.Handle(
 		"/static/",
