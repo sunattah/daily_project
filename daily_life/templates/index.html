@@ -12,73 +12,177 @@
 
 <body>
 
-    <header>
-        <div class="logo">
-            DailyLife
-        </div>
+<header>
 
-        <nav>
-            <a href="/">Dashboard</a>
-            <a href="#">Tasks</a>
-            <a href="#">Schedule</a>
-            <a href="#">Notes</a>
-        </nav>
-    </header>
+    <div class="logo">
+        DailyLife
+    </div>
 
+    <nav>
+        <a href="/">Dashboard</a>
+        <a href="#">Tasks</a>
+        <a href="#">Schedule</a>
+        <a href="#">Notes</a>
+    </nav>
 
-    <main>
-
-        <section class="welcome">
-            <h1>Good morning! 👋</h1>
-            <p>Let's make today productive.</p>
-        </section>
+</header>
 
 
-        <section class="cards">
+<main>
 
-            <div class="card">
-                <h2>Tasks</h2>
-                <p class="number">0</p>
-                <p>Tasks for today</p>
+    <section class="welcome">
+
+        <h1>Good morning! 👋</h1>
+
+        <p>Let's make today productive.</p>
+
+    </section>
+
+
+    <!-- ADD TASK -->
+
+    <section class="add-task">
+
+        <h2>Add a Task</h2>
+
+        <form action="/add-task" method="POST">
+
+            <input
+                type="text"
+                name="title"
+                placeholder="What do you need to do?"
+                required
+            >
+
+            <select name="priority">
+
+                <option value="Low">
+                    Low
+                </option>
+
+                <option value="Medium">
+                    Medium
+                </option>
+
+                <option value="High">
+                    High
+                </option>
+
+            </select>
+
+            <button type="submit">
+                Add Task
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- TASK LIST -->
+
+    <section class="tasks">
+
+        <h2>Today's Tasks</h2>
+
+        {{if .Tasks}}
+
+            {{range .Tasks}}
+
+            <div class="task">
+
+                <div class="task-info">
+
+                    {{if .Completed}}
+
+                        <span class="completed">
+                            {{.Title}}
+                        </span>
+
+                    {{else}}
+
+                        <span>
+                            {{.Title}}
+                        </span>
+
+                    {{end}}
+
+                    <small>
+                        Priority: {{.Priority}}
+                    </small>
+
+                </div>
+
+
+                <div class="task-actions">
+
+                    <form action="/complete-task" method="POST">
+
+                        <input
+                            type="hidden"
+                            name="id"
+                            value="{{.ID}}"
+                        >
+
+                        <button type="submit">
+                            {{if .Completed}}
+                                Undo
+                            {{else}}
+                                Complete
+                            {{end}}
+                        </button>
+
+                    </form>
+
+
+                    <form action="/delete-task" method="POST">
+
+                        <input
+                            type="hidden"
+                            name="id"
+                            value="{{.ID}}"
+                        >
+
+                        <button type="submit">
+                            Delete
+                        </button>
+
+                    </form>
+
+                </div>
+
             </div>
 
-            <div class="card">
-                <h2>Schedule</h2>
-                <p class="number">0</p>
-                <p>Activities planned</p>
-            </div>
+            {{end}}
 
-            <div class="card">
-                <h2>Progress</h2>
-                <p class="number">0%</p>
-                <p>Today's progress</p>
-            </div>
-
-        </section>
-
-
-        <section class="activities">
-
-            <h2>Today's Activities</h2>
+        {{else}}
 
             <div class="empty">
-                <p>You don't have any activities yet.</p>
 
-                <button>
-                    Add Activity
-                </button>
+                <p>
+                    You don't have any tasks yet.
+                </p>
+
             </div>
 
-        </section>
+        {{end}}
 
-    </main>
+    </section>
 
 
-    <footer>
-        <p>DailyLife &copy; 2026</p>
-    </footer>
+</main>
 
-    <script src="/static/js/app.js"></script>
+
+<footer>
+
+    <p>
+        DailyLife &copy; 2026
+    </p>
+
+</footer>
+
+
+<script src="/static/js/app.js"></script>
 
 </body>
 
