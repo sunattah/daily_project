@@ -20,6 +20,7 @@ type Activity struct {
 }
 
 var schedule []Activity
+
 var nextActivityID = 1
 
 var tasks []Task
