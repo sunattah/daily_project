@@ -13,6 +13,14 @@ type Task struct {
 	Priority  string
 	Completed bool
 }
+type Activity struct {
+	ID       int
+	Time     string
+	Activity string
+}
+
+var schedule []Activity
+var nextActivityID = 1
 
 var tasks []Task
 var nextID = 1
@@ -33,6 +41,22 @@ func home(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, data)
 	if err != nil {
 		http.Error(w, "Unable to display page", http.StatusInternalServerError)
+		return
+	}
+}
+func showSchedule(w http.ResponseWriter, r *http.Request) {
+
+	tmpl, err := template.ParseFiles("templates/schedule.html")
+
+	if err != nil {
+		http.Error(w, "Unable to load schedule", http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.Execute(w, nil)
+
+	if err != nil {
+		http.Error(w, "Unable to display schedule", http.StatusInternalServerError)
 		return
 	}
 }
@@ -117,6 +141,7 @@ func main() {
 	http.HandleFunc("/add-task", addTask)
 	http.HandleFunc("/complete-task", completeTask)
 	http.HandleFunc("/delete-task", deleteTask)
+	http.HandleFunc("/schedule", showSchedule)
 
 	http.Handle(
 		"/static/",
