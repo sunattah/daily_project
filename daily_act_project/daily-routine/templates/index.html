@@ -1,59 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Daily Routine</title>
-    <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; color: #222; }
-        header { margin-bottom: 24px; }
-        h1 { margin-bottom: 4px; }
-        .tagline { color: #777; font-size: 14px; margin: 0; }
-        .date-nav { margin-top: 16px; margin-bottom: 24px; color: #555; }
-        .date-nav a { margin-right: 12px; text-decoration: none; color: #2563eb; }
-        ul { list-style: none; padding: 0; }
-        li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .time { font-weight: 600; width: 60px; color: #444; flex-shrink: 0; padding-top: 2px; }
-        .desc { flex: 1; white-space: pre-wrap; }
-        .completed .desc { text-decoration: line-through; color: #999; }
-        form { display: inline; }
-        button { border: none; background: none; cursor: pointer; }
-        .toggle-btn { font-size: 16px; }
-        .delete-btn { color: #dc2626; font-size: 14px; }
-        .add-link { display: inline-block; margin-top: 20px; padding: 8px 16px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; }
-        .empty { color: #888; font-style: italic; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daybook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #16202B;
+    --panel: #1E2C3A;
+    --paper: #EDE6D6;
+    --muted: #8FA1B3;
+    --line: #2C3E50;
+    --amber: #E8A33D;
+    --sage: #7FA96B;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .masthead h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 34px;
+    margin: 0;
+    letter-spacing: 0.2px;
+  }
+
+  .masthead p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .date-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .date-picker span {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .date-picker input[type="date"] {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--paper);
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    color-scheme: dark;
+  }
+
+  .date-picker input[type="date"]:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 2px;
+  }
+
+  .log {
+    margin-top: 40px;
+  }
+
+  .entry {
+    position: relative;
+    display: flex;
+    gap: 18px;
+    padding: 0 0 28px 4px;
+  }
+
+  .entry:last-of-type {
+    padding-bottom: 8px;
+  }
+
+  .rail {
+    position: relative;
+    width: 12px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .rail::before {
+    content: "";
+    position: absolute;
+    top: 18px;
+    bottom: -28px;
+    width: 1px;
+    background: var(--line);
+  }
+
+  .entry:last-of-type .rail::before {
+    display: none;
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--amber);
+    background: transparent;
+    margin-top: 4px;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .entry.done .dot {
+    border-color: var(--sage);
+    background: var(--sage);
+  }
+
+  .entry-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .entry-top {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .entry-time {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .entry.done .entry-time {
+    color: var(--sage);
+  }
+
+  .entry-desc {
+    margin: 4px 0 0;
+    white-space: pre-wrap;
+    color: var(--paper);
+  }
+
+  .entry.done .entry-desc {
+    color: var(--muted);
+  }
+
+  .entry-actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .entry-actions button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 2px 4px;
+    font-family: inherit;
+  }
+
+  .entry-actions button:hover {
+    color: var(--paper);
+  }
+
+  .entry-actions .delete:hover {
+    color: #C97064;
+  }
+
+  .entry-actions button:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 2px;
+  }
+
+  .empty {
+    color: var(--muted);
+    font-style: italic;
+    padding: 24px 0 24px 30px;
+  }
+
+  .add-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    margin-left: 30px;
+    color: var(--amber);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    border-bottom: 1px solid transparent;
+  }
+
+  .add-link:hover {
+    border-bottom-color: var(--amber);
+  }
+
+  .add-link:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot { transition: none; }
+  }
+
+  @media (max-width: 480px) {
+    .page { padding: 32px 16px 60px; }
+    .masthead h1 { font-size: 28px; }
+    header { align-items: flex-start; }
+    .date-picker { align-items: flex-start; }
+  }
+</style>
 </head>
 <body>
+  <div class="page">
     <header>
-        <h1>Daily Routine</h1>
-        <p class="tagline">Plan your day, track what you actually did.</p>
+      <div class="masthead">
+        <h1>Daybook</h1>
+        <p>a running log of your day</p>
+      </div>
+      <form method="get" action="/" class="date-picker">
+        <span>Viewing</span>
+        <input type="date" name="date" value="{{.Date}}" onchange="this.form.submit()">
+      </form>
     </header>
-    <div class="date-nav">
-        <form method="get" action="/" style="display:inline;">
-            <input type="date" name="date" value="{{.Date}}" onchange="this.form.submit()">
-        </form>
-        — {{.Date}}
-    </div>
 
-    {{if .Activities}}
-    <ul>
+    <div class="log">
+      {{if .Activities}}
         {{range .Activities}}
-        <li class="{{if .Completed}}completed{{end}}">
-            <span class="time">{{.Time}}</span>
-            <span class="desc">{{.Description}}</span>
-            <form method="post" action="/toggle?id={{.ID}}&date={{$.Date}}">
-                <button class="toggle-btn" title="Toggle done">{{if .Completed}}↩{{else}}✔{{end}}</button>
-            </form>
-            <form method="post" action="/delete?id={{.ID}}&date={{$.Date}}">
-                <button class="delete-btn" title="Delete">✕</button>
-            </form>
-        </li>
+        <div class="entry{{if .Completed}} done{{end}}">
+          <div class="rail"><div class="dot"></div></div>
+          <div class="entry-body">
+            <div class="entry-top">
+              <span class="entry-time">{{.Time}}</span>
+              <div class="entry-actions">
+                <form method="post" action="/toggle?id={{.ID}}&date={{$.Date}}">
+                  <button type="submit">{{if .Completed}}Reopen{{else}}Done{{end}}</button>
+                </form>
+                <form method="post" action="/delete?id={{.ID}}&date={{$.Date}}">
+                  <button type="submit" class="delete">Delete</button>
+                </form>
+              </div>
+            </div>
+            <p class="entry-desc">{{.Description}}</p>
+          </div>
+        </div>
         {{end}}
-    </ul>
-    {{else}}
-    <p class="empty">No activities logged for this day yet.</p>
-    {{end}}
-
-    <a class="add-link" href="/add?date={{.Date}}">+ Add Activity</a>
+      {{else}}
+        <p class="empty">Nothing logged for this day yet.</p>
+      {{end}}
+      <a class="add-link" href="/add?date={{.Date}}">+ New entry</a>
+    </div>
+  </div>
 </body>
 </html>
