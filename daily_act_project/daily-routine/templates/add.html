@@ -5,6 +5,9 @@
     <title>Add Activity</title>
     <style>
         body { font-family: sans-serif; max-width: 500px; margin: 40px auto; padding: 0 20px; color: #222; }
+        header { margin-bottom: 8px; }
+        h1 { margin-bottom: 4px; }
+        .tagline { color: #777; font-size: 14px; margin: 0 0 16px 0; }
         label { display: block; margin-top: 16px; font-weight: 600; }
         input, textarea { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; font-size: 14px; font-family: inherit; }
         textarea { resize: vertical; }
@@ -13,7 +16,10 @@
     </style>
 </head>
 <body>
-    <h1>Add Activity</h1>
+    <header>
+        <h1>Daily Routine</h1>
+        <p class="tagline">Add Activity</p>
+    </header>
     <form method="post" action="/add">
         <label for="date">Date</label>
         <input type="date" id="date" name="date" value="{{.Date}}" required>
