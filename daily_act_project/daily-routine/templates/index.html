@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Routine</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; color: #222; }
+        h1 { margin-bottom: 4px; }
+        .date-nav { margin-bottom: 24px; color: #555; }
+        .date-nav a { margin-right: 12px; text-decoration: none; color: #2563eb; }
+        ul { list-style: none; padding: 0; }
+        li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .time { font-weight: 600; width: 60px; color: #444; flex-shrink: 0; padding-top: 2px; }
+        .desc { flex: 1; white-space: pre-wrap; }
+        .completed .desc { text-decoration: line-through; color: #999; }
+        form { display: inline; }
+        button { border: none; background: none; cursor: pointer; }
+        .toggle-btn { font-size: 16px; }
+        .delete-btn { color: #dc2626; font-size: 14px; }
+        .add-link { display: inline-block; margin-top: 20px; padding: 8px 16px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; }
+        .empty { color: #888; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>Daily Routine</h1>
+    <div class="date-nav">
+        <form method="get" action="/" style="display:inline;">
+            <input type="date" name="date" value="{{.Date}}" onchange="this.form.submit()">
+        </form>
+        — {{.Date}}
+    </div>
+
+    {{if .Activities}}
+    <ul>
+        {{range .Activities}}
+        <li class="{{if .Completed}}completed{{end}}">
+            <span class="time">{{.Time}}</span>
+            <span class="desc">{{.Description}}</span>
+            <form method="post" action="/toggle?id={{.ID}}&date={{$.Date}}">
+                <button class="toggle-btn" title="Toggle done">{{if .Completed}}↩{{else}}✔{{end}}</button>
+            </form>
+            <form method="post" action="/delete?id={{.ID}}&date={{$.Date}}">
+                <button class="delete-btn" title="Delete">✕</button>
+            </form>
+        </li>
+        {{end}}
+    </ul>
+    {{else}}
+    <p class="empty">No activities logged for this day yet.</p>
+    {{end}}
+
+    <a class="add-link" href="/add?date={{.Date}}">+ Add Activity</a>
+</body>
+</html>
