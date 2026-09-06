@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -24,7 +25,11 @@ var tmpl *template.Template
 
 func initDB() {
 	var err error
-	db, err = sql.Open("sqlite3", "routine.db")
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "routine.db"
+	}
+	db, err = sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -178,6 +183,10 @@ func main() {
 	mux.HandleFunc("/toggle", toggleHandler)
 	mux.HandleFunc("/delete", deleteHandler)
 
-	log.Println("Server running on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Println("Server running on port " + port)
+	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
